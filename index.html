@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- © 2026 Andrés Pintos · Fxcalcos.uy. Todos los derechos reservados. -->
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Control de Obra y Caja</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#c2410c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Control AP">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#f4f1ec;--cd:#fff;--tx:#1f2328;--mu:#6b7280;--ac:#c2410c;--ok:#15803d;--no:#b91c1c;--wa:#b45309;--bd:#e5e0d8}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#17171a;--cd:#232328;--tx:#ececec;--mu:#9ca3af;--ac:#fb923c;--ok:#4ade80;--no:#f87171;--wa:#fbbf24;--bd:#34343b}}
+:root[data-theme=dark]{--bg:#17171a;--cd:#232328;--tx:#ececec;--mu:#9ca3af;--ac:#fb923c;--ok:#4ade80;--no:#f87171;--wa:#fbbf24;--bd:#34343b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:140px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);display:flex;justify-content:space-between;align-items:center;padding:12px 16px;z-index:5;max-width:760px;margin:auto}
+h1{font-size:22px;margin:0}
+main{max-width:760px;margin:auto;padding:0 16px}
+button{font:inherit;border:1px solid var(--bd);background:var(--cd);color:var(--tx);border-radius:10px;padding:9px 14px;cursor:pointer}
+button.pr{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+button.ok{color:var(--ok);border-color:var(--ok)}button.no{color:var(--no);border-color:var(--no)}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.kp div{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:10px}
+.kp small{display:block;color:var(--mu);font-size:12px}.kp b{font-size:17px}
+.ch{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}
+.ch button{padding:6px 12px;border-radius:99px;white-space:nowrap}
+.ch button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.cd{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer}
+.cd p{margin:6px 0;color:var(--mu);font-size:14px}
+.rw{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.cd .rw+.rw,.mt+.rw{margin-top:8px}
+.mt{font-size:13px;color:var(--mu);margin-bottom:6px}
+.tt{font-size:20px}
+.bg{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid;white-space:nowrap}
+.Aceptado{color:var(--ok)}.Rechazado{color:var(--no)}.Pendiente,.Monitoreo,.Agendado{color:var(--wa)}.Entregado{color:var(--ok)}
+.En.producción{color:var(--ac)}
+.pos{color:var(--ok)}.neg{color:var(--no)}
+.ac{font-size:13px;margin-top:6px;color:var(--ac)}
+.em{text-align:center;color:var(--mu);padding:30px 0}
+.fab{position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;font-size:30px;padding:0;background:var(--ac);color:#fff;border:0;box-shadow:0 4px 12px #0004;z-index:6}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav button{flex:1;border:0;border-radius:0;background:none;font-size:13px;color:var(--mu);padding:10px 4px}
+nav button.on{color:var(--ac);font-weight:700}
+dialog{width:min(520px,94vw);max-height:92vh;overflow:auto;background:var(--cd);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:16px}
+dialog::backdrop{background:#0007}
+dialog h2{margin:0 0 8px;font-size:19px}
+label{display:block;font-size:13px;color:var(--mu);margin-top:10px;flex:1}
+input,select,textarea{width:100%;font:inherit;margin-top:3px;padding:9px;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx)}
+.row{display:flex;gap:8px}.row[hidden]{display:none}
+.acts{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}.acts button{flex:1}
+#sal{font-weight:600;margin:10px 0 0}
+.it{align-items:center;margin-top:6px}.it button{padding:8px 10px}.ab{flex:1;text-align:center;border:1px solid var(--bd);border-radius:10px;padding:9px 14px;color:var(--tx);text-decoration:none;background:var(--cd)}
+.ft{max-width:760px;margin:24px auto 0;text-align:center;font-size:12px;color:var(--mu);padding:0 16px}
+.hl{display:flex;align-items:center;gap:10px}
+.br{text-align:center;margin:4px 0 12px}.br svg{max-width:100%}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="0 0 200 200"><rect width="200" height="200" rx="28" fill="#c2410c"/><polyline points="38,80 100,32 162,80" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><text x="100" y="142" text-anchor="middle" style="font:500 70px system-ui,sans-serif;fill:#fff;letter-spacing:2px">AP</text><g fill="none" stroke="#fff" stroke-width="2" opacity=".85"><rect x="31" y="164" width="30" height="12" rx="2"/><rect x="67" y="164" width="30" height="12" rx="2"/><rect x="103" y="164" width="30" height="12" rx="2"/><rect x="139" y="164" width="30" height="12" rx="2"/><rect x="49" y="180" width="30" height="12" rx="2"/><rect x="85" y="180" width="30" height="12" rx="2"/><rect x="121" y="180" width="30" height="12" rx="2"/></g></symbol></svg>
+<header><div class="hl"><svg width="34" height="34" role="img" aria-label="AP"><use href="#lg" width="34" height="34"/></svg><h1 id="t"></h1></div><div class="hl"><button data-act="eye" id="eye" aria-label="Ocultar o mostrar montos">👁</button><button data-act="bk" aria-label="Respaldo">⋯</button></div></header>
+<div class="br"><svg width="150" viewBox="0 0 200 250" role="img" aria-label="Logo AP, teléfono 094 144 424"><use href="#lg" width="200" height="200"/><text x="100" y="236" text-anchor="middle" style="font:500 28px system-ui,sans-serif;fill:var(--tx);letter-spacing:1px">094 144 424</text></svg></div>
+<main id="v"></main>
+<button class="fab" data-act="add" aria-label="Agregar">+</button>
+<nav><button data-t="p">📋<br>Presupuestos</button><button data-t="c">💰<br>Caja</button><button data-t="o">🚚<br>Pedidos</button></nav>
+<footer class="ft">© 2026 Andrés Pintos · Fxcalcos.uy<br>Todos los derechos reservados</footer>
+<dialog id="dl"></dialog><dialog id="d2"></dialog>
+<script>
+const $=s=>document.querySelector(s),fr=n=>'$'+Math.round(n||0).toLocaleString('es-UY'),fm=n=>hide?'••••':fr(n),
+esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+td=()=>new Date().toISOString().slice(0,10),fd=d=>d?d.split('-').reverse().join('/'):'—',
+uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),dl=$('#dl');
+let db,tab='p',flt='Todos',cur={},armed=0,hide=0;
+const seed=()=>({p:[],c:[],o:[]});
+try{db=JSON.parse(localStorage.getItem('ctrlobra1'))}catch(e){}
+db=db||seed();try{hide=localStorage.getItem('ctrlobra_hide')=='1'}catch(e){}
+const save=()=>{try{localStorage.setItem('ctrlobra1',JSON.stringify(db))}catch(e){}};
+const I=(l,k,t,v,e='')=>`<label>${l}<input id="f_${k}" type="${t}" value="${esc(v)}" ${e}></label>`,
+S=(l,k,a,v)=>`<label>${l}<select id="f_${k}">${a.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select></label>`,
+T=(l,k,v,r=2)=>`<label>${l}<textarea id="f_${k}" rows="${r}">${esc(v)}</textarea></label>`,
+g=k=>$('#f_'+k).value;
+function rp(){const A=db.p.filter(x=>x.est=='Aceptado'),P=db.p.filter(x=>x.est=='Pendiente'),
+L=db.p.filter(x=>flt=='Todos'||x.est==flt).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+return `<div class="kp"><div><small>Aceptados</small><b>${fm(sum(A,x=>x.total))}</b></div><div><small>Pendientes</small><b>${fm(sum(P,x=>x.total))}</b></div><div><small>Por cobrar</small><b>${fm(sum(A,x=>x.total-x.adel))}</b></div></div>
+<div class="ch">${['Todos','Pendiente','Aceptado','Rechazado'].map(s=>`<button data-act="flt" data-v="${s}" class="${flt==s?'on':''}">${s}</button>`).join('')}</div>`+
+(L.map(x=>`<div class="cd" data-act="ep" data-id="${x.id}"><div class="rw"><b>${esc(x.cli)||'Sin cliente'}</b><span class="bg ${x.est}">${x.est}</span></div><p>${esc(x.det)}</p>
+<div class="mt">${fd(x.fecha)} · ${x.mod}${x.mod!='Trabajo cerrado'?` (${x.cant} × ${fm(x.tarifa)})`:''}${x.tiempo?' · ⏱ '+esc(x.tiempo):''} · Materiales: ${x.mat}</div>
+<div class="rw"><b class="tt">${fm(x.total)}</b><small>Adelanto ${fm(x.adel)} · Saldo ${fm(x.total-x.adel)}</small></div>
+${x.est=='Pendiente'?`<div class="acts"><button class="ok" data-act="st" data-id="${x.id}" data-v="Aceptado">✔ Aceptó</button><button class="no" data-act="st" data-id="${x.id}" data-v="Rechazado">✖ No aceptó</button></div>`:''}</div>`).join('')||'<p class="em">No hay presupuestos acá. Tocá + para crear uno.</p>')}
+function rc(){const i=sum(db.c,x=>x.ing),e=sum(db.c,x=>x.egr);
+return `<div class="kp"><div><small>Ingresos</small><b class="pos">${fm(i)}</b></div><div><small>Egresos</small><b class="neg">${fm(e)}</b></div><div><small>Balance</small><b class="${i-e<0?'neg':'pos'}">${fm(i-e)}</b></div></div>`+
+(db.c.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(x=>`<div class="cd" data-act="ec" data-id="${x.id}"><div class="rw"><b>${esc(x.desc)}</b><b class="${x.ing?'pos':'neg'}">${x.ing?'+'+fm(x.ing):'−'+fm(x.egr)}</b></div><div class="mt">${fd(x.fecha)} · ${esc(x.cat)}${x.notas?' · '+esc(x.notas):''}</div></div>`).join('')||'<p class="em">Sin movimientos todavía.</p>')}
+function ro(){return db.o.map(x=>`<div class="cd" data-act="eo" data-id="${x.id}"><div class="rw"><b>${esc(x.prod)}</b><span class="bg ${x.est.replace(' ','.')}">${x.est}${x.cuando?' · '+esc(x.cuando):''}</span></div><p>${esc(x.cli)} — ${esc(x.det)}</p>${x.accion?`<div class="ac">👉 ${esc(x.accion)}</div>`:''}</div>`).join('')||'<p class="em">Sin pedidos. Tocá + para agregar.</p>'}
+function R(){$('#eye').textContent=hide?'🙈':'👁';$('#t').textContent={p:'Presupuestos',c:'Caja',o:'Pedidos'}[tab];
+document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));
+$('#v').innerHTML={p:rp,c:rc,o:ro}[tab]()}
+function btns(del){return `<div class="acts"><button class="pr" data-act="sv">Guardar</button><button data-act="cl">Cancelar</button>${del?'<button class="no" data-act="del">Eliminar</button>':''}</div>`}
+function open_(k,id,html,it){cur={k,id,items:JSON.parse(JSON.stringify(it||[]))};armed=0;dl.innerHTML=html+btns(id);dl.showModal();if(k=='p')ri()}
+function fp(id){const x=db.p.find(i=>i.id==id)||{fecha:td(),mod:'Trabajo cerrado',mat:'SI',est:'Pendiente',cant:1,tarifa:0,total:0,adel:0};
+open_('p',id,`<h2>${id?'Editar':'Nuevo'} presupuesto</h2>${I('Fecha','fecha','date',x.fecha)}${I('Cliente / contacto','cli','text',x.cli)}${T('Detalle del trabajo','det',x.det,3)}
+${S('Modalidad de cobro','mod',['Trabajo cerrado','Por hora','Por día'],x.mod)}
+<div class="row" id="cal">${I('Cantidad (horas o días)','cant','number',x.cant,'inputmode="decimal"')}${I('Tarifa $U','tarifa','number',x.tarifa)}</div>
+${I('Mano de obra / trabajo $U','trab','number',x.trab??x.total)}
+<label>Materiales (cantidad · artículo · precio c/u)</label><div id="its"></div><div class="acts"><button data-act="addi">+ Agregar material</button></div><p id="msub" style="margin:8px 0 0;font-size:14px"></p>
+<div class="row">${I('Traslado: km','km','number',x.km||0,'inputmode="decimal"')}${I('Precio por km $U','pkm','number',x.pkm||0)}</div>
+${I('Total $U (trabajo + materiales + traslado)','total','number',x.total,'readonly')}${I('Tiempo estimado','tiempo','text',x.tiempo,'placeholder="ej: 3 días"')}${S('¿Incluye materiales?','mat',['SI','NO'],x.mat)}
+<div class="row">${I('Adelanto $U','adel','number',x.adel)}${I('Fecha adelanto','fadel','date',x.fadel)}</div>${I('Fecha cobro final','fcobro','date',x.fcobro)}
+${S('Estado','est',['Pendiente','Aceptado','Rechazado'],x.est)}${T('Notas de obra','notas',x.notas)}<p id="sal"></p><div class="acts"><button data-act="wa">Enviar por WhatsApp</button></div>`,x.items)}
+function ri(){$('#its').innerHTML=cur.items.map((m,i)=>`<div class="row it"><input data-i="${i}" data-k="n" type="number" inputmode="decimal" value="${m.n}" placeholder="Cant" style="flex:.7"><input data-i="${i}" data-k="art" value="${esc(m.art)}" placeholder="Artículo" style="flex:2"><input data-i="${i}" data-k="pr" type="number" inputmode="decimal" value="${m.pr}" placeholder="$ c/u" style="flex:1"><button data-act="rmi" data-i="${i}" aria-label="Quitar">✕</button></div>`).join('');calc()}
+function calc(){if(!$('#f_mod'))return;const c=g('mod')=='Trabajo cerrado';$('#cal').hidden=c;$('#f_trab').readOnly=!c;
+if(!c)$('#f_trab').value=(+g('cant')||0)*(+g('tarifa')||0);
+const sm=sum(cur.items,x=>x.n*x.pr),tv=(+g('km')||0)*(+g('pkm')||0),t=(+g('trab')||0)+sm+tv;
+$('#msub').textContent='Subtotal materiales: '+fr(sm)+(tv?' · Traslado: '+fr(tv):'');$('#f_total').value=t;$('#sal').textContent='Saldo pendiente: '+fr(t-(+g('adel')||0))}
+dl.addEventListener('input',e=>{const t=e.target.dataset;if(t.k)cur.items[t.i][t.k]=t.k=='art'?e.target.value:(+e.target.value||0);calc()});
+function fc(id){const x=db.c.find(i=>i.id==id)||{fecha:td(),ing:0,egr:0};
+open_('c',id,`<h2>${id?'Editar':'Nuevo'} movimiento</h2>${I('Fecha','fecha','date',x.fecha)}${S('Tipo','tipo',['Ingreso','Egreso'],x.ing?'Ingreso':'Egreso')}${I('Monto $U','monto','number',x.ing||x.egr||'')}
+<label>Categoría<input id="f_cat" list="cats" value="${esc(x.cat||'')}"><datalist id="cats">${['Cobros','Vivienda','Terreno','Servicios','Almacén','Materiales','Herramientas','Transporte','Otros'].map(c=>`<option>${c}</option>`).join('')}</datalist></label>${I('Descripción','desc','text',x.desc)}${T('Notas','notas',x.notas)}`)}
+function fo(id){const x=db.o.find(i=>i.id==id)||{est:'Agendado'};
+open_('o',id,`<h2>${id?'Editar':'Nuevo'} pedido</h2>${I('Producto / servicio','prod','text',x.prod)}${I('Cliente / proveedor','cli','text',x.cli)}${T('Detalle / cantidad','det',x.det)}
+${S('Estado','est',['Agendado','En producción','Monitoreo','Entregado'],x.est)}${I('Entrega / cuándo','cuando','text',x.cuando,'placeholder="ej: viernes"')}${I('Acción requerida','accion','text',x.accion)}`)}
+function put(k,o){if(cur.id)Object.assign(db[k].find(i=>i.id==cur.id),o);else{o.id=uid();db[k].push(o)}save();dl.close();R()}
+function sv(){const k=cur.k;
+if(k=='p'){calc();const m=g('mod'),n=+g('cant')||0,t=+g('tarifa')||0;put('p',{fecha:g('fecha'),cli:g('cli'),det:g('det'),mod:m,cant:n,tarifa:t,trab:+g('trab')||0,items:cur.items.filter(x=>x.art||x.pr),km:+g('km')||0,pkm:+g('pkm')||0,total:+g('total')||0,mat:g('mat'),tiempo:g('tiempo'),adel:+g('adel')||0,fadel:g('fadel'),fcobro:g('fcobro'),est:g('est'),notas:g('notas')})}
+if(k=='c'){const m=+g('monto')||0,i=g('tipo')=='Ingreso';put('c',{fecha:g('fecha'),cat:g('cat'),desc:g('desc'),ing:i?m:0,egr:i?0:m,notas:g('notas')})}
+if(k=='o')put('o',{prod:g('prod'),cli:g('cli'),det:g('det'),est:g('est'),cuando:g('cuando'),accion:g('accion')})}
+function wa(){calc();const m=g('mod'),ce=m=='Trabajo cerrado',it=cur.items.filter(x=>x.art||x.pr),tv=(+g('km')||0)*(+g('pkm')||0);
+let x=`*Presupuesto*${g('cli')?' para '+g('cli'):''}\n${g('det')}\n\nModalidad: ${m}`;
+if(ce){if(it.length)x+='\n\nMateriales incluidos:\n'+it.map(a=>`- ${a.n} ${a.art}`).join('\n');if(tv)x+='\nTraslado incluido'}
+else{x+=`\n\nMano de obra: ${g('cant')} × ${fr(+g('tarifa'))} = ${fr(+g('trab'))}`;if(it.length)x+='\n\nMateriales:\n'+it.map(a=>`- ${a.n} ${a.art}: ${fr(a.n*a.pr)}`).join('\n');if(tv)x+=`\n\nTraslado: ${g('km')} km × ${fr(+g('pkm'))} = ${fr(tv)}`}
+x+=`\n\n*Total: ${fr(+g('total'))}*`+(g('tiempo')?'\nTiempo estimado: '+g('tiempo'):'')+(+g('adel')?'\nAdelanto: '+fr(+g('adel')):'');
+const d=$('#d2');d.innerHTML=`<h2>Mensaje para WhatsApp</h2><p style="color:var(--mu);font-size:14px;margin:0">Podés editarlo antes de enviar.</p><textarea id="f_msg" rows="12">${esc(x)}</textarea><p id="s2"></p><div class="acts"><button class="pr" data-act="cp2">Copiar mensaje</button><a class="ab" data-act="ow" href="https://wa.me/" target="_blank" rel="noopener">Abrir WhatsApp</a><button data-act="cl2">Cerrar</button></div>`;d.showModal()}
+function bk(){cur={k:'b'};dl.innerHTML=`<h2>Respaldo de datos</h2><p style="color:var(--mu);font-size:14px">Tus datos se guardan en este navegador. Para pasarlos a otro aparato (celular ↔ PC), copiá este texto y pegalo allá con “Restaurar”.</p><textarea id="f_bk" rows="8">${esc(JSON.stringify(db))}</textarea><p id="sal"></p><div class="acts"><button data-act="cp">Copiar</button><button class="pr" data-act="rs">Restaurar</button><button data-act="cl">Cerrar</button></div>`;dl.showModal()}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-t]');if(t){tab=t.dataset.t;R();return}
+const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+if(a=='flt'){flt=b.dataset.v;R()}
+else if(a=='st'){db.p.find(i=>i.id==id).est=b.dataset.v;save();R()}
+else if(a=='ep')fp(id);else if(a=='ec')fc(id);else if(a=='eo')fo(id);
+else if(a=='add')({p:fp,c:fc,o:fo})[tab]();
+else if(a=='sv')sv();else if(a=='cl')dl.close();else if(a=='wa')wa();else if(a=='bk')bk();
+else if(a=='addi'){cur.items.push({n:1,art:'',pr:0});ri()}
+else if(a=='rmi'){cur.items.splice(+b.dataset.i,1);ri()}
+else if(a=='eye'){hide=!hide;try{localStorage.setItem('ctrlobra_hide',hide?'1':'0')}catch(_){}R()}
+else if(a=='ow')b.href='https://wa.me/?text='+encodeURIComponent($('#f_msg').value);
+else if(a=='cl2')$('#d2').close();
+else if(a=='cp2'){const v=$('#f_msg');v.select();try{navigator.clipboard.writeText(v.value)}catch(_){document.execCommand('copy')}$('#s2').textContent='Copiado ✔ — pegalo en WhatsApp'}
+else if(a=='del'){if(!armed){armed=1;b.textContent='¿Seguro? Tocá de nuevo'}else{db[cur.k]=db[cur.k].filter(i=>i.id!=cur.id);save();dl.close();R()}}
+else if(a=='cp'){const v=$('#f_bk');v.select();try{navigator.clipboard.writeText(v.value);$('#sal').textContent='Copiado ✔'}catch(_){document.execCommand('copy');$('#sal').textContent='Copiado ✔'}}
+else if(a=='rs'){try{const d=JSON.parse($('#f_bk').value);if(!Array.isArray(d.p)||!Array.isArray(d.c)||!Array.isArray(d.o))throw 0;db=d;save();dl.close();R()}catch(_){$('#sal').textContent='El texto no es un respaldo válido.'}}});
+R();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
