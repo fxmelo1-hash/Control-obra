@@ -52,7 +52,7 @@ input,select,textarea{width:100%;font:inherit;margin-top:3px;padding:9px;border:
 .br{text-align:center;margin:4px 0 12px}.br svg{max-width:100%}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="0 0 200 200"><rect width="200" height="200" rx="28" fill="#c2410c"/><polyline points="38,80 100,32 162,80" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><text x="100" y="142" text-anchor="middle" style="font:500 70px system-ui,sans-serif;fill:#fff;letter-spacing:2px">AP</text><g fill="none" stroke="#fff" stroke-width="2" opacity=".85"><rect x="31" y="164" width="30" height="12" rx="2"/><rect x="67" y="164" width="30" height="12" rx="2"/><rect x="103" y="164" width="30" height="12" rx="2"/><rect x="139" y="164" width="30" height="12" rx="2"/><rect x="49" y="180" width="30" height="12" rx="2"/><rect x="85" y="180" width="30" height="12" rx="2"/><rect x="121" y="180" width="30" height="12" rx="2"/></g></symbol></svg>
-<header><div class="hl"><svg width="34" height="34" role="img" aria-label="AP"><use href="#lg" width="34" height="34"/></svg><h1 id="t"></h1></div><div class="hl"><button data-act="eye" id="eye" aria-label="Ocultar o mostrar montos">👁</button><button data-act="bk" aria-label="Respaldo">⋯</button></div></header>
+<header><div class="hl"><svg width="34" height="34" role="img" aria-label="AP"><use href="#lg" width="34" height="34"/></svg><h1 id="t"></h1></div><div class="hl"><button data-act="tf" aria-label="Tarifas">⚙</button><button data-act="eye" id="eye" aria-label="Ocultar o mostrar montos">👁</button><button data-act="bk" aria-label="Respaldo">⋯</button></div></header>
 <div class="br"><svg width="150" viewBox="0 0 200 250" role="img" aria-label="Logo AP, teléfono 094 144 424"><use href="#lg" width="200" height="200"/><text x="100" y="236" text-anchor="middle" style="font:500 28px system-ui,sans-serif;fill:var(--tx);letter-spacing:1px">094 144 424</text></svg></div>
 <main id="v"></main>
 <button class="fab" data-act="add" aria-label="Agregar">+</button>
@@ -67,6 +67,9 @@ uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5),
 sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),dl=$('#dl');
 let db,tab='p',flt='Todos',cur={},armed=0,hide=0;
 const seed=()=>({p:[],c:[],o:[]});
+const TF0={pen:{piso:500,alb:800,pin:900,urg:1000,rec:12},res:{piso:450,alb:600,pin:700,urg:800,rec:0},imp:15};
+const tf=()=>{const t=db.tf||{};return{pen:Object.assign({},TF0.pen,t.pen),res:Object.assign({},TF0.res,t.res),imp:t.imp??TF0.imp}};
+const ZONAS=['Península','Resto de Maldonado'],TIPOS=['Albañilería / mantenimiento','Pintura de terminación','Urgente / riesgo'];
 try{db=JSON.parse(localStorage.getItem('ctrlobra1'))}catch(e){}
 db=db||seed();try{hide=localStorage.getItem('ctrlobra_hide')=='1'}catch(e){}
 const save=()=>{try{localStorage.setItem('ctrlobra1',JSON.stringify(db))}catch(e){}};
@@ -79,7 +82,7 @@ L=db.p.filter(x=>flt=='Todos'||x.est==flt).sort((a,b)=>b.fecha.localeCompare(a.f
 return `<div class="kp"><div><small>Aceptados</small><b>${fm(sum(A,x=>x.total))}</b></div><div><small>Pendientes</small><b>${fm(sum(P,x=>x.total))}</b></div><div><small>Por cobrar</small><b>${fm(sum(A,x=>x.total-x.adel))}</b></div></div>
 <div class="ch">${['Todos','Pendiente','Aceptado','Rechazado'].map(s=>`<button data-act="flt" data-v="${s}" class="${flt==s?'on':''}">${s}</button>`).join('')}</div>`+
 (L.map(x=>`<div class="cd" data-act="ep" data-id="${x.id}"><div class="rw"><b>${esc(x.cli)||'Sin cliente'}</b><span class="bg ${x.est}">${x.est}</span></div><p>${esc(x.det)}</p>
-<div class="mt">${fd(x.fecha)} · ${x.mod}${x.mod!='Trabajo cerrado'?` (${x.cant} × ${fm(x.tarifa)})`:''}${x.tiempo?' · ⏱ '+esc(x.tiempo):''} · Materiales: ${x.mat}</div>
+<div class="mt">${fd(x.fecha)} · ${x.mod}${x.mod!='Trabajo cerrado'?` (${x.cant} × ${fm(x.tarifa)})`:''}${x.tiempo?' · ⏱ '+esc(x.tiempo):''} · Materiales: ${x.mat}${x.hreal&&x.trab?' · '+fm(x.trab/x.hreal)+'/h real':''}</div>
 <div class="rw"><b class="tt">${fm(x.total)}</b><small>Adelanto ${fm(x.adel)} · Saldo ${fm(x.total-x.adel)}</small></div>
 ${x.est=='Pendiente'?`<div class="acts"><button class="ok" data-act="st" data-id="${x.id}" data-v="Aceptado">✔ Aceptó</button><button class="no" data-act="st" data-id="${x.id}" data-v="Rechazado">✖ No aceptó</button></div>`:''}</div>`).join('')||'<p class="em">No hay presupuestos acá. Tocá + para crear uno.</p>')}
 function rc(){const i=sum(db.c,x=>x.ing),e=sum(db.c,x=>x.egr);
@@ -91,8 +94,12 @@ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dat
 $('#v').innerHTML={p:rp,c:rc,o:ro}[tab]()}
 function btns(del){return `<div class="acts"><button class="pr" data-act="sv">Guardar</button><button data-act="cl">Cancelar</button>${del?'<button class="no" data-act="del">Eliminar</button>':''}</div>`}
 function open_(k,id,html,it){cur={k,id,items:JSON.parse(JSON.stringify(it||[]))};armed=0;dl.innerHTML=html+btns(id);dl.showModal();if(k=='p')ri()}
-function fp(id){const x=db.p.find(i=>i.id==id)||{fecha:td(),mod:'Trabajo cerrado',mat:'SI',est:'Pendiente',cant:1,tarifa:0,total:0,adel:0};
+function fp(id){const x=db.p.find(i=>i.id==id)||{fecha:td(),mod:'Trabajo cerrado',mat:'SI',est:'Pendiente',cant:1,tarifa:0,total:0,adel:0,zona:'Península',tipo:TIPOS[0]};
 open_('p',id,`<h2>${id?'Editar':'Nuevo'} presupuesto</h2>${I('Fecha','fecha','date',x.fecha)}${I('Cliente / contacto','cli','text',x.cli)}${T('Detalle del trabajo','det',x.det,3)}
+<div style="border:1px dashed var(--bd);border-radius:12px;padding:0 10px 10px;margin-top:12px"><label style="margin-top:8px"><b>Ayuda de precio (opcional)</b></label>
+<div class="row">${S('Zona','zona',ZONAS,x.zona||ZONAS[0])}${S('Tipo de trabajo','tipo',TIPOS,x.tipo||TIPOS[0])}</div>
+<div class="row">${I('Horas estimadas','hest','number',x.hest||'','inputmode="decimal"')}${I('Horas reales (al terminar)','hreal','number',x.hreal||'','inputmode="decimal"')}</div>
+<p id="sug" style="font-size:14px;margin:8px 0 0"></p><div class="acts"><button data-act="us">Usar valor sugerido</button></div></div>
 ${S('Modalidad de cobro','mod',['Trabajo cerrado','Por hora','Por día'],x.mod)}
 <div class="row" id="cal">${I('Cantidad (horas o días)','cant','number',x.cant,'inputmode="decimal"')}${I('Tarifa $U','tarifa','number',x.tarifa)}</div>
 ${I('Mano de obra / trabajo $U','trab','number',x.trab??x.total)}
@@ -105,8 +112,22 @@ function ri(){$('#its').innerHTML=cur.items.map((m,i)=>`<div class="row it"><inp
 function calc(){if(!$('#f_mod'))return;const c=g('mod')=='Trabajo cerrado';$('#cal').hidden=c;$('#f_trab').readOnly=!c;
 if(!c)$('#f_trab').value=(+g('cant')||0)*(+g('tarifa')||0);
 const sm=sum(cur.items,x=>x.n*x.pr),tv=(+g('km')||0)*(+g('pkm')||0),t=(+g('trab')||0)+sm+tv;
-$('#msub').textContent='Subtotal materiales: '+fr(sm)+(tv?' · Traslado: '+fr(tv):'');$('#f_total').value=t;$('#sal').textContent='Saldo pendiente: '+fr(t-(+g('adel')||0))}
+$('#msub').textContent='Subtotal materiales: '+fr(sm)+(tv?' · Traslado: '+fr(tv):'');$('#f_total').value=t;sg();$('#sal').textContent='Saldo pendiente: '+fr(t-(+g('adel')||0))}
 dl.addEventListener('input',e=>{const t=e.target.dataset;if(t.k)cur.items[t.i][t.k]=t.k=='art'?e.target.value:(+e.target.value||0);calc()});
+function rate(){const T=tf(),z=g('zona')==ZONAS[1]?T.res:T.pen,k=g('tipo'),b=k==TIPOS[1]?z.pin:k==TIPOS[2]?z.urg:z.alb;return{z,b,h:b*(1+z.rec/100)*(1+T.imp/100)}}
+function sg(){const e=$('#sug');if(!e)return;const r=rate(),h=+g('hest')||0,hr=+g('hreal')||0,tr=+g('trab')||0;let x='';
+if(h){const sug=Math.round(h*r.h);x+=`Sugerido mano de obra: <b>${fr(sug)}</b> (${h} h × ${fr(r.b)} + logística ${r.z.rec}% + imprevistos ${tf().imp}%). Piso: ${fr(h*r.z.piso)}.`;
+if(tr){const p=tr/h;x+=p<r.z.piso?` <span class="neg">⚠ Quedás en ${fr(p)} por hora, debajo de tu piso (${fr(r.z.piso)}).</span>`:` <span class="pos">✔ ${fr(p)} por hora, sobre tu piso.</span>`}}
+else x+=`Poné las horas estimadas y te sugiero un precio. Tarifa de la zona: ${fr(r.b)}/h (piso ${fr(r.z.piso)}).`;
+if(hr&&tr){const p=tr/hr;x+=`<br>Ganancia real: <b>${fr(p)} por hora</b>${p<r.z.piso?' <span class="neg">(bajo el piso)</span>':''}.`}
+e.innerHTML=x}
+function us(){const r=rate(),h=+g('hest')||0,m=g('mod');if(!h)return;
+if(m=='Trabajo cerrado')$('#f_trab').value=Math.round(h*r.h);
+else if(m=='Por hora'){$('#f_cant').value=h;$('#f_tarifa').value=Math.round(r.h)}
+else{$('#f_cant').value=Math.round(h/8*10)/10;$('#f_tarifa').value=Math.round(r.h*8)}
+calc()}
+function ftf(){const T=tf(),z=(p,o)=>`<div class="row">${I('Piso $/h',p+'p','number',o.piso)}${I('Albañilería $/h',p+'a','number',o.alb)}</div><div class="row">${I('Pintura $/h',p+'i','number',o.pin)}${I('Urgente $/h',p+'u','number',o.urg)}</div>${I('Recargo acceso y logística %',p+'r','number',o.rec)}`;
+open_('t',0,`<h2>Tarifas por hora</h2><p style="color:var(--mu);font-size:14px;margin:0">Valores de referencia. Cambialos cuando quieras: se usan en la ayuda de precio de cada presupuesto.</p><h3 style="margin:14px 0 0">Península</h3>${z('p',T.pen)}<h3 style="margin:14px 0 0">Resto de Maldonado</h3>${z('r',T.res)}${I('Imprevistos % (se suma a todo)','imp','number',T.imp)}`)}
 function fc(id){const x=db.c.find(i=>i.id==id)||{fecha:td(),ing:0,egr:0};
 open_('c',id,`<h2>${id?'Editar':'Nuevo'} movimiento</h2>${I('Fecha','fecha','date',x.fecha)}${S('Tipo','tipo',['Ingreso','Egreso'],x.ing?'Ingreso':'Egreso')}${I('Monto $U','monto','number',x.ing||x.egr||'')}
 <label>Categoría<input id="f_cat" list="cats" value="${esc(x.cat||'')}"><datalist id="cats">${['Cobros','Vivienda','Terreno','Servicios','Almacén','Materiales','Herramientas','Transporte','Otros'].map(c=>`<option>${c}</option>`).join('')}</datalist></label>${I('Descripción','desc','text',x.desc)}${T('Notas','notas',x.notas)}`)}
@@ -115,8 +136,9 @@ open_('o',id,`<h2>${id?'Editar':'Nuevo'} pedido</h2>${I('Producto / servicio','p
 ${S('Estado','est',['Agendado','En producción','Monitoreo','Entregado'],x.est)}${I('Entrega / cuándo','cuando','text',x.cuando,'placeholder="ej: viernes"')}${I('Acción requerida','accion','text',x.accion)}`)}
 function put(k,o){if(cur.id)Object.assign(db[k].find(i=>i.id==cur.id),o);else{o.id=uid();db[k].push(o)}save();dl.close();R()}
 function sv(){const k=cur.k;
-if(k=='p'){calc();const m=g('mod'),n=+g('cant')||0,t=+g('tarifa')||0;put('p',{fecha:g('fecha'),cli:g('cli'),det:g('det'),mod:m,cant:n,tarifa:t,trab:+g('trab')||0,items:cur.items.filter(x=>x.art||x.pr),km:+g('km')||0,pkm:+g('pkm')||0,total:+g('total')||0,mat:g('mat'),tiempo:g('tiempo'),adel:+g('adel')||0,fadel:g('fadel'),fcobro:g('fcobro'),est:g('est'),notas:g('notas')})}
+if(k=='p'){calc();const m=g('mod'),n=+g('cant')||0,t=+g('tarifa')||0;put('p',{fecha:g('fecha'),cli:g('cli'),det:g('det'),mod:m,cant:n,tarifa:t,trab:+g('trab')||0,items:cur.items.filter(x=>x.art||x.pr),km:+g('km')||0,pkm:+g('pkm')||0,total:+g('total')||0,mat:g('mat'),tiempo:g('tiempo'),adel:+g('adel')||0,fadel:g('fadel'),fcobro:g('fcobro'),est:g('est'),notas:g('notas'),zona:g('zona'),tipo:g('tipo'),hest:+g('hest')||0,hreal:+g('hreal')||0})}
 if(k=='c'){const m=+g('monto')||0,i=g('tipo')=='Ingreso';put('c',{fecha:g('fecha'),cat:g('cat'),desc:g('desc'),ing:i?m:0,egr:i?0:m,notas:g('notas')})}
+if(k=='t'){const q=p=>({piso:+g(p+'p')||0,alb:+g(p+'a')||0,pin:+g(p+'i')||0,urg:+g(p+'u')||0,rec:+g(p+'r')||0});db.tf={pen:q('p'),res:q('r'),imp:+g('imp')||0};save();dl.close();R();return}
 if(k=='o')put('o',{prod:g('prod'),cli:g('cli'),det:g('det'),est:g('est'),cuando:g('cuando'),accion:g('accion')})}
 function wa(){calc();const m=g('mod'),ce=m=='Trabajo cerrado',it=cur.items.filter(x=>x.art||x.pr),tv=(+g('km')||0)*(+g('pkm')||0);
 let x=`*Presupuesto*${g('cli')?' para '+g('cli'):''}\n${g('det')}\n\nModalidad: ${m}`;
@@ -132,6 +154,7 @@ else if(a=='st'){db.p.find(i=>i.id==id).est=b.dataset.v;save();R()}
 else if(a=='ep')fp(id);else if(a=='ec')fc(id);else if(a=='eo')fo(id);
 else if(a=='add')({p:fp,c:fc,o:fo})[tab]();
 else if(a=='sv')sv();else if(a=='cl')dl.close();else if(a=='wa')wa();else if(a=='bk')bk();
+else if(a=='tf')ftf();else if(a=='us')us();
 else if(a=='addi'){cur.items.push({n:1,art:'',pr:0});ri()}
 else if(a=='rmi'){cur.items.splice(+b.dataset.i,1);ri()}
 else if(a=='eye'){hide=!hide;try{localStorage.setItem('ctrlobra_hide',hide?'1':'0')}catch(_){}R()}
